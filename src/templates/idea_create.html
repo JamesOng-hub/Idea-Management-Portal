@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block content %} 
+<div class="col-8 offset-1 mb-5 mt-5">
+    <h3>{{ title }} Idea</h3>
+    {{ form.media }}
+    <form method="POST" action="." enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form|crispy }}
+        {% if not posted %}
+        <button class="btn btn-primary" type="submit" name="draft">Save as draft</button>
+        {% endif %}
+        <button class="btn btn-primary" type="submit" name="final">Submit</button>
+    </form>
+</div>
+{% endblock content %}

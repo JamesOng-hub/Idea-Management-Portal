@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/Challenge_detail.css' %}" type="text/css">
+<section class="title-section">
+  <div class="title-container-1">
+    <div class="title-container-2">
+      <h1 class="title">{{ challenge.title }}</h1>
+      
+      {% if request.user.is_authenticated %}
+      <div>
+        <button class="btn btn-link"id="subscribe-button" value="{{challenge.id}}">
+    
+          {% if subscribed %}
+          <span  style="background-color: grey; color: white;" name="text">UNSUBSCRIBE</span>
+          {% else %}
+          <span class="btn" style="background-color: green ; color: white;" name="text">SUBSCRIBE</span>
+          {% endif %}
+        </button>
+        <span id="subscriber_count" style="font-size:20px;">{{challenge.subscribers_count}}</span>
+      </div>
+      {% endif %}
+    </div>
+    <div style="display: inline;">
+      {% for tag in challenge.tags.all %}
+      <span class="item-tag">{{ tag }}</span>
+      {% endfor %}
+    </div>
+    
+    <div class="details-container">
+      <div class="details-container-1">
+        <div class="profile-container-1">
+          <a href="{% url 'user-profile' challenge.author.username %}">
+          <img class="profile-1" src="{{ challenge.author.profile.image.url}}" alt="PICTURE" onerror=this.src="{% static 'logo/user.png' %}">
+          </a>
+          <a href="{% url 'user-profile' challenge.author.username %}">{{challenge.author}}</a>
+        </div> 
+        <div class="logo-container-1">
+          <img class="logo-1" src="{% static 'logo/deadline.png' %}" aria-label="Deadline">
+          <div>{{ challenge.idea_submission_deadline |date:"F d, Y"}}</div>
+        </div>  
+        <div class="logo-container-1">
+          <img class="logo-1" src="{% static 'logo/lightbulb.png' %}" >
+          <div>{{ challenge.idea_count }}</div>
+        </div>  
+  
+    </div>
+      <div class="details-container-1">
+
+        {% if request.user == challenge.author %}
+          <div class="float-right">
+            <a class="logo-container-1"  data-toggle="modal" data-target="#deleteModal" style="cursor: pointer;"><img class="logo-1" src="{% static 'logo/delete.png' %}" ></a>
+          </div> 
+          <!-- Modal -->
+          <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog">
+          <div class="modal-dialog" role="document">
+          <div class="modal-content">
+          <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Confirmation</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          </div>
+          <div class="modal-body">  
+            Are you sure you want to delete your challenge? 
+          </div>
+          <div class="modal-footer">
+            <a href="{% url 'challenge-delete' pk=challenge.pk %}" class="btn btn-danger">delete</a>
+          </div>
+          </div>
+          </div>
+          </div>
+          <div class="float-right">
+            <a class="logo-container-1" href="{% url 'challenge-update' challenge.id %}"><img class="logo-1" src="{% static 'logo/edit.png' %}" ></a>
+          </div>
+       
+        {% endif %}
+  
+ 
+        
+       
+  
+      </div>
+    </div>
+    <img src="{{ challenge.thumbnail.url }}" class="thumbnail">
+  </div>     
+
+</section>
+<section class="content-section">
+    <div class="content-container">
+      {{ challenge.description | safe }}
+    </div>
+</section>
+
+  <section class="criteria-section">
+    <div class="content-container">
+      <div class="criteria-title">Judging Criteria</div>
+      {% for criteria in challenge.criterias.all %}
+      <div class="criteria-1">
+        <div>
+          {{ criteria.description }}
+        </div>
+      </div>
+      {% endfor %}
+       
+      {% if challenge.is_active %}
+      <div class="btn-container-1">
+        {% if not user.is_authenticated %}
+        <a class="btn btn-outline-secondary" href="{% url 'account_login' %}?next={{ next_url }}"> Submit Your Idea</a>
+        {% else %}
+        <a class="btn btn-outline-secondary" href="{% url 'idea-submit' challenge.id %}"> Submit Your Idea </a>
+        {% endif %}
+      </div>
+      {% else %}
+      <h5 style="margin: 1rem; ">Challenge has ended. Please check out the submitted ideas below.</h5>
+      {% endif %}
+    </div>
+  </section>
+
+  <section class="ideas-section">
+    <div class="idea-container">
+      <div class="title-container">  
+        <h2 class="submitted-ideas-title">Submitted Ideas</h2>
+      </div>
+      <div class="ideas">
+        {% for idea in idea_list %}
+        
+        <div class="item-1">
+          <div>
+            <a href="{{ idea.get_absolute_url }}">
+              <img class="idea-img-1" src="{{ idea.thumbnail.url }}" alt="MyPhoto">
+            </a>
+            <div>
+              {% for tag in idea.tags.all %}
+              <span class="item-tag">{{ tag }}</span>
+              {% empty %}
+              <div class="item-tag-1">no tags</div>
+              {% endfor %}
+            </div>
+            <a class="item-title-1" href="{{ idea.get_absolute_url }}">{{idea.title}}</a>
+            <div class="p-1">{{ idea.overview }}</div>
+  
+          
+          </div>
+          
+          <div class="info-container-1">
+              <div class="logo-container-1">
+                <div>{{ idea.author }}</div>
+              </div>
+              <div class="logo-container-1">
+                  <img class="logo-1" src="{% static 'logo/like.png' %}" >
+                  <div>{{ idea.vote_count }}</div>
+              </div>
+              <div class="logo-container-1">
+                <img class="logo-1" src="{% static 'logo/comment.png' %}" >
+                <div>{{ idea.comment_count }}</div>
+              </div>
+          </div>
+          </div>
+          
+          {% empty %}
+          <div>No submitted ideas so far. </div>
+        {% endfor%}
+      </div>
+
+      <div>
+           
+        <ul class="pagination-list">
+            {% if queryset.has_previous %} 
+            <li class="page-arrow-container"><a href="#"><img src="{% static 'logo/arrow_left.png'%}" class="page-arrow"></a></li>
+            {% endif %}
+            <li class="page-item"><a class="text-style" href="#">1</a></li>
+            {% if queryset.has_next %}
+            <li class="page-arrow-container"><a href="#"><img src="{% static 'logo/arrow_right.png'%}" class="page-arrow"></a></li>
+            {% endif %}
+        </ul>
+
+    </div>
+  </section>
+  <script>
+    $(document).on('click', '#subscribe-button', function (e) {
+      e.preventDefault();
+      $.ajax({
+        type: 'POST',
+        url: "{% url 'subscribe' %}",
+        data: {
+          challengeid: $('#subscribe-button').val(),
+          "csrfmiddlewaretoken": "{{ csrf_token }}",
+          action: 'post'
+        },
+        success: function (json) {
+          document.getElementById("subscriber_count").innerHTML = json['result']
+          sub = document.getElementsByName("text");
+          if (json['subscribed'] == true) {
+            $(sub).css("color", "white");
+            $(sub).css("background-color", "grey");
+            $(sub).text("UNSUBSCRIBE");
+          }
+          else if (json['subscribed'] == false) {
+            $(sub).css("color", "white");
+            $(sub).css("background-color", "green");
+            $(sub).text("SUBSCRIBE") ;
+          }
+        },
+        error: function (xhr, errmsg, err) {
+        }
+      });
+    })
+  </script>
+{% endblock content %}
+
+

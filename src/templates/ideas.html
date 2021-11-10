@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{%load static%}
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/Ideas.css' %}">
+  <section class="section-1">
+      <div class="content">
+
+          <div class="right-column">
+            <h1>Ideas Dashboard</h1>
+            <form method="GET" action=".">
+            <div class="btn-container">
+              <div>
+                <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#filterModal">
+                  Filter
+                </button>
+                <div id="sorting" class="form-group" style="display: inline;">
+                  <select name="sort" id="sort" class="btn btn-outline-secondary" onchange="this.form.submit()">
+                    <option id="popularity" value="popularity"><b>Popularity</b></option>
+                    <option id="newest" value="newest"><b>Newest</b></option>
+                  </select>
+                </div>
+                
+              </div>
+              
+
+              {% if user.is_authenticated %}
+              <div class="submit-btn-container">
+                 <a href ="/create" class=" btn btn-outline-secondary create-btn">Submit Your Idea</a>
+              </div>
+              {% endif %}
+            </div>
+                
+                <!-- Modal -->
+                <div class="modal fade" id="filterModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Filter</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                      
+                          {% for cat in category_count %}
+                          <div >
+                            <input type="checkbox" value="{{cat.tags__title}}" name="category" {% if cat.tags__title in categories %}
+                              checked {% endif %}>
+                            <label>{{ cat.tags__title }} ({{ cat.tags__title__count }})</label>
+                             
+                          </div>
+                          {% empty %}
+                          <div>
+                            No filters currently.
+                          </div>
+                            
+                          {% endfor %}
+                            
+                            <button type="submit" class="btn btn-outline-secondary modal-filter-btn">Filter</button>
+                        
+                      </div>
+                  
+                    </div>
+                  </div>
+                </div>
+              </form>
+                <!-- <div class="modal fade" id="sortModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Sort by: </h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        <select name="sort"  class="form-control" onchange="this.form.submit()">
+                          <option  value="popularity"><b>Popularity</b></option>
+                          <option  value="newest"><b>Newest</b></option>
+                        </select>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                      </div>
+                    </div>
+                  </div>
+                </div> -->
+             
+              <div class="ideas">
+                  {% for idea in queryset %}
+                <div class="item-1">
+                  <div>
+                    <a href="{{ idea.get_absolute_url }}">
+                      <img class="idea-img-1" src="{{ idea.thumbnail.url }}" alt="MyPhoto">
+                    </a>
+                    <div>
+                      {% for tag in idea.tags.all %}
+                      <span class="item-tag">{{ tag }}</span>
+                      {% empty %}
+                      <div class="item-tag-1">no tags</div>
+                      {% endfor %}
+                    </div>
+                
+                    <a class="item-title-1" href="{{ idea.get_absolute_url }}">{{idea.title}}</a>
+                    <div class="p-1">{{ idea.overview }}</div>
+                
+                  </div>
+                  <div class="info-container-1">
+                
+                    <div class="logo-container-1">
+                      <!-- <img class="logo-1" src="{% static 'img/avatar-3.png' %}" > -->
+                      <div>{{ idea.author }}</div>
+                    </div>
+                    <div class="logo-container-1">
+                      <img class="logo-1" src="{% static 'logo/deadline.png' %}">
+                      <div>{{ idea.date_posted |date:"F d, Y" }}</div>
+                    </div>
+                    <div class="logo-container-1">
+                      <div>Votes: {{ idea.vote_count }}</div>
+                    </div>
+                  </div>
+                
+                
+                </div>
+
+                  {% endfor %}
+              </div>
+
+              <div>
+
+                  <ul class="pagination-list">
+                      {% if queryset.has_previous %}
+                      <li class="page-arrow-container"><a href="?{{ page_request_var }}={{ queryset.previous_page_number }}"><img src="{% static 'logo/arrow_left.png'%}" class="page-arrow"></a></li>
+                      {% endif %}
+                      <li class="page-item"><a class="text-style" href="?{{ page_request_var }}={{ queryset.number }}">{{ queryset.number }}</a></li>
+                      {% if queryset.has_next %}
+                      <li class="page-arrow-container"><a href="?{{ page_request_var }}={{ queryset.next_page_number }}"><img src="{% static 'logo/arrow_right.png'%}" class="page-arrow"></a></li>
+                      {% endif %}
+                  </ul>
+
+              </div>
+          </div>
+      </div>
+
+  </section>
+  <script>
+    var sort = "{{sort}}";
+    document.getElementById("sort").value = sort;
+  </script>
+
+  {% endblock content%}

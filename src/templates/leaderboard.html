@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/Leaderboard.css' %}">
+<section class="intro-section">
+
+        <!-- <div class="content-title">
+            Leaderboard
+        </div> -->
+        <div class ="cover">
+            <div class="container">
+              <div class="text-container">
+                <h1 class="title">Leaderboard </h1>
+                <p>Our leaderboard ranks users based on their level of interaction. Users gain points by submiting ideas and solving challenges. </p>
+               
+              </div>
+            </div>
+        </div>
+
+    </section>
+    <section class="content-section">
+    <div class="content-container"> 
+        <div class="content-title">
+            Our top Contributers
+        </div>
+        <div class="table">
+            <div class="table-header">
+                <div class="table-header-cell">Ranking</div>
+                <div class="table-header-cell">Contributor</div>
+                <div class="table-header-cell">Points</div>
+            </div>
+            <div class="table-body">
+
+                {% for topuser in toplist %}
+                        {% if topuser.0 == user_name %}
+                        <div class="table-row" style="background-color: azure;">
+                            <div class="table-body-cell ranking">{{ forloop.counter }}</div>
+                            <a class="table-body-cell" href="{% url 'user-profile' user_name  %}">{{ user_name }}</a>
+                            <div class="table-body-cell">{{ user_score }}</div>
+
+                        </div>
+                        {% else %}
+                        <div class="table-row">
+                            <div class="table-body-cell ranking">{{ forloop.counter }}</div>
+                            <a class="table-body-cell" href="{% url 'user-profile' topuser.0  %}">{{ topuser.0 }}</a>
+                            <div class="table-body-cell">{{ topuser.1 }}</div>
+
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+
+                   {% if user_is_not_top %}
+
+                    {% if user_name %}
+                        <div class="table-row" style="background-color: azure;">
+                            <div class="table-body-cell ranking">{{ user_rank }}</div>
+                            <a class="table-body-cell" href="{% url 'user-profile' user_name  %}">{{ user_name }}</a>
+                            <div class="table-body-cell">{{ user_score }}</div>
+
+                        </div>
+                    {% endif %}
+                   {% endif %}
+
+                
+                <!-- <div class="table-row">
+                        <div class="table-body-cell ranking">01</div>
+                        <a class="table-body-cell">James</a>
+                        <div class="table-body-cell">678</div>     
+                    
+                </div>
+                <div class="table-row">
+                    <div class="table-body-cell ranking">01</div>
+                    <a class="table-body-cell">James</a>
+                    <div class="table-body-cell">678</div>      -->
+                
+            </div>
+            </div>
+        </div>
+        
+    </div>
+    </section>
+    {% endblock %}

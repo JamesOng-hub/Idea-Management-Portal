@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block content %} 
+<style>
+    .image_picker_image{
+        max-width: 180px;
+        max-height: auto;
+    }
+</style>
+<div class="col-8 offset-1 mb-5 mt-5">
+    <h3>{{ title }} Challenge</h3>
+    {{ form.media }}
+    <form method="POST" action="." enctype="multipart/form-data">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="fieldWrapper">
+            {{ field.errors }}
+            {{ field |as_crispy_field }}
+            {% if field == form.thumbnail %}
+            <div class="form-group">
+                <select class="image-picker" name="image-picker">
+                    <option value=""></option>
+                    {% for img in image_bank %}
+                    <option id="{{ img }}" data-img-src="/media/{{ img }}" value="{{ img }}" name="thumbnail"></option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% endif %}
+
+        </div>
+        {% endfor %}
+        <div class="fieldWrapper">
+            <div id="div_id_criterias" class="form-group">
+                <label for="id_criterias">Criterias</label>
+                <button class="add_field_button" style="margin: 5px">Add Criteria</button>
+                <div class="input_fields_wrap">
+                    {% for criteria in set_criterias %}
+                    <div><input type="text" name="criteria" style="margin: 5px;" list="criterias" value="{{ criteria }}"></div>
+                    {% endfor %}
+                    <div><input type="text" name="criteria" style="margin: 5px;" list="criterias"></div>
+                </div>
+                <datalist id="criterias">
+                    {% for criteria in criterias %}
+                    <option value="{{criteria}}">
+                    {% endfor %}
+                </datalist>
+                <small id="hint_id_criterias" class="form-text text-muted">Each idea submitted to this challenge will be evaluated based on the given criterias</small>
+            </div>
+        </div>
+        <!-- {{ form|crispy }} -->
+        
+        {% if not posted %}
+        <button class="btn btn-primary" type="submit" name="draft">Save as draft</button>
+        {% endif %}
+        <button class="btn btn-primary" type="submit" name="final">Submit</button>
+
+        
+        
+    </form>
+
+</div>
+
+
+<script src="{% static 'js/image-picker.min.js' %}"></script>
+
+<script>
+    $('.image-picker').imagepicker();
+    //custom script to allow user to add criterias to challenge instance
+    $(document).ready(function () {
+        var max_fields = 10; //maximum input boxes allowed
+        var wrapper = $(".input_fields_wrap"); //Fields wrapper
+        var add_button = $(".add_field_button"); //Add button ID
+
+        var x = 1; //initlal text box count
+        $(add_button).click(function (e) { //on add input button click
+            e.preventDefault();
+            if (x < max_fields) { //max input box allowed
+                x++; //text box increment
+                $(wrapper).append('<div><input type="text" name="criteria" style="margin: 5px;" list="criterias"><a href="#" class="remove_field">Remove</a></div>'); //add input box
+            }
+        });
+        $(wrapper).on("click", ".remove_field", function (e) { //user click on remove text
+            e.preventDefault(); $(this).parent('div').remove(); x--;
+        })
+    });
+</script>
+{% endblock content %}

@@ -1,0 +1,315 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+
+<link rel="stylesheet" href="{% static 'css/UserProfile.css' %}">
+<section class="title-section">
+  <div class="title-container">
+    <div class="img-container">
+      <img class="profile-custom"src="{{ user_obj.image.url }}"> 
+      <div>
+        {% if user_obj == user.profile %}
+        <a href="{% url 'profile' %}" class="edit-btn btn btn-outline-secondary profile-btn"><span>edit profile</span></a>
+        {% endif %}
+      </div>
+    </div>
+    <div class="details-container">
+      <h1>{{user_obj}}   </h1>
+      <div>
+        <span class="occupation">{{user_obj.occupation}}</span>
+        <span class="email">{{user_obj.user.email}}</span>
+        <span>Score: {{ user.profile.score }}</span>
+      </div>
+      
+      <div></div>
+      <div>{{user_obj.bio}}
+      </div>
+    </div>
+  </div>
+  
+</section>
+
+<section>
+  <div class="tab-container">
+    <nav>
+      <div class="nav nav-tabs" id="nav-tab" role="tablist">
+        <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-ideas" role="tab"
+          aria-controls="nav-ideas" aria-selected="true">Ideas</a>
+        <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-subscriptions" role="tab"
+          aria-controls="nav-subscriptions" aria-selected="false">Subscribed</a>
+        {% if user_obj == user.profile %}
+        <a class="nav-item nav-link" id="nav-home-tab" data-toggle="tab" href="#nav-notifications" role="tab"
+          aria-controls="nav-notifications" aria-selected="false">Notifications</a>
+        <a class="nav-item nav-link" id="nav-contact-tab" data-toggle="tab" href="#nav-drafts" role="tab"
+          aria-controls="nav-drafts" aria-selected="false">Idea Drafts</a>
+        {% if perms.challenges.add_challenge %}
+        <a class="nav-item nav-link" id="nav-challenges-tab" data-toggle="tab" href="#nav-challenges" role="tab"
+          aria-controls="nav-challenges" aria-selected="false">Challenges</a>
+        <a class="nav-item nav-link" id="nav-challenge_drafts-tab" data-toggle="tab" href="#nav-challenge_drafts" role="tab"
+          aria-controls="nav-challenge_drafts" aria-selected="false">Challenge Drafts</a>
+        <a class="nav-item nav-link" id="nav-pending-tab" data-toggle="tab" href="#nav-pending" role="tab"
+          aria-controls="nav-pending" aria-selected="false">Approve List</a>
+        {% endif %}
+        {% endif %}
+      </div>
+    </nav>
+    <div class="tab-content" id="nav-tabContent">
+      <div class="tab-pane fade show active" id="nav-ideas" role="tabpanel" aria-labelledby="nav-ideas-tab">
+        <header>
+          {% if user_obj == user.profile %}
+          <p>
+          <h3 class="mb-3">My Ideas ({{ page_obj.paginator.count }}) </h3>
+          </p>
+          {% else %}
+          <p>
+          <h3 class="mb-3">Ideas by {{ view.kwargs.username }} ({{ page_obj.paginator.count }}) </h3>
+          </p>
+          {% endif %}
+        </header>
+        <div class="row">
+          {% for idea in ideas %}
+          <div class="item-1">
+            <div>
+              <a href="{{ idea.get_absolute_url }}">
+                <img class="idea-img-1" src="{{ idea.thumbnail.url }}" alt="MyPhoto">
+              </a>
+              <div>
+                {% for tag in idea.tags.all %}
+                <span class="item-tag">{{ tag }}</span>
+                {% empty %}
+                <div class="item-tag-1">no tags</div>
+                {% endfor %}
+              </div>
+
+              <a class="item-title-1" {% if not idea.date_posted %} href="{% url 'idea-update' pk=idea.pk %}" {% else %}
+                href="{{ idea.get_absolute_url }}" {% endif %}>{{idea.title}}</a>
+              {% if not idea.date_posted %}<a href="{% url 'idea-update' pk=idea.pk %}"> Edit Draft</a>{% endif %}
+              <div class="p-1">{{ idea.overview }}</div>
+
+            </div>
+            <div class="info-container-1">
+              <div class="logo-container-1">
+                <img class="logo-1" src="{% static 'logo/deadline.png' %}">
+                <div>{{ idea.date_posted |date:"F d, Y" }}</div>
+              </div>
+
+            </div>
+
+
+          </div>
+          {%empty%}
+          <p>No ideas.</p>
+          {% endfor %}
+          {% if is_paginated %}
+          <ul class="pagination-list">
+            {% if page_obj.has_previous %}
+            <li class="page-arrow-container"><a href="?page={{ page_obj.previous_page_number }}"><img
+                  src="{% static 'logo/arrow_left.png'%}" class="page-arrow"></a></li>
+            {% endif %}
+            {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+            <li class="page-item"><b class="text-style" style="color:antiquewhite; cursor: default;">{{page_obj.number }}</b></li>
+            {% endif %}
+            {%endfor%}
+            {% if page_obj.has_next %}
+            <li class="page-arrow-container"><a href="?page={{ page_obj.paginator.num_pages }}"><img
+                  src="{% static 'logo/arrow_right.png'%}" class="page-arrow"></a></li>
+            {% endif %}
+          </ul>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="tab-pane fade" id="nav-subscriptions" role="tabpanel" aria-labelledby="nav-subscriptions-tab">
+        <header>
+          <p>
+          <h3 class="mb-3">Subscribed</h3>
+          </p>
+        </header>
+        <div class="row">
+          {% for challenge in user_obj.get_subscriptions %}
+          <div class="cha-item-1">
+            <div>
+              <a href="{{ challenge.get_absolute_url }}">
+                <img class="cha-item-img-1" src="{{ challenge.thumbnail.url }}" alt="MyPhoto">
+              </a>
+              <div>
+                {% for tag in challenge.tags.all %}
+                <span class="cha-item-tag-1">{{ tag }}</span>
+                {%empty%}
+                <div class="cha-item-tag-empty">No tags </div>
+                {% endfor %}
+              </div>
+              <div>
+                <a class="cha-item-title-1" href="{{ challenge.get_absolute_url }}">{{challenge.title}}</a>
+              </div>
+            </div>
+        
+            <div class="info-container-1">
+              <div class="logo-container-1">
+                <img class="logo-1" src="{% static 'logo/deadline.png' %}">
+                <div>{{ challenge.idea_submission_deadline |date:"F d, Y" }}</div>
+              </div>
+              <div class="logo-container-1">
+                <img class="logo-1" src="{% static 'logo/lightbulb.png' %}">
+                <div>{{ challenge.idea_count }}</div>
+              </div>
+            </div>
+          </div>
+          {%empty%}
+          <p>No Subscribed Challenges.</p>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="tab-pane fade" id="nav-notifications" role="tabpanel" aria-labelledby="nav-notifications-tab">
+        <header>
+          <p>
+          <h3 class="mb-3">Notifications</h3>
+          </p>
+        </header>
+        <div class="col-md-10 col-md-offset-1">
+          <ul class="noti-list">
+            {% for notification in request.user.notifications.all %}
+            <li class="noti-item"><b class="noti-actor">{{ notification.actor }}</b> {{ notification.verb }}:
+              <br>
+              {% if notification.description|length > 0 %}
+              "{{ notification.description }}"
+              <br>
+              {% endif %}
+              <font color="grey">{{ notification.timesince }} ago</font>
+            </li>
+
+            {% empty %}
+            No notifications.
+            {% endfor %}
+          </ul>
+
+        </div>
+      </div>
+
+      <div class="tab-pane fade" id="nav-drafts" role="tabpanel" aria-labelledby="nav-drafts-tab">
+        <header>
+          <p>
+          <h3 class="mb-3">Idea Drafts</h3>
+          </p>
+        </header>
+        <div class="row">
+          {% for draft in drafts %}
+          <div class="item-1">
+            <div>
+              <a href="{{ draft.get_absolute_url }}">
+                <img class="idea-img-1" src="{{ draft.thumbnail.url }}" alt="MyPhoto">
+              </a>
+              <div>Last modified: {{ draft.date_modified |date:"F d, Y" }}</div>
+              <a class="item-title-1" href="{% url 'idea-update' pk=draft.pk %}">{{ draft.title }}</a>
+              <div>
+                <a href="{% url 'idea-update' pk=draft.pk %}"> Edit Draft</a>
+              </div>
+              <div class="p-1">{{ draft.overview }}</div>
+        
+            </div>
+          </div>
+        
+        
+        
+          {%empty%}
+          <p>No Drafts.</p>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="tab-pane fade" id="nav-challenges" role="tabpanel" aria-labelledby="nav-challenges-tab">
+        <header>
+          <p>
+          <h3 class="mb-3">Challenges Posted</h3>
+          </p>
+        </header>
+        <div class="row">
+          {% for challenge in user_obj.get_challenges %}
+          <div class="cha-item-1">
+            <div>
+              <a href="{{ challenge.get_absolute_url }}">
+                <img class="cha-item-img-1" src="{{ challenge.thumbnail.url }}" alt="MyPhoto">
+              </a>
+              <div>
+                {% for tag in challenge.tags.all %}
+                <span class="cha-item-tag-1">{{ tag }}</span>
+                {%empty%}
+                <div class="cha-item-tag-empty">No tags </div>
+                {% endfor %}
+              </div>
+              <div>
+                <a class="cha-item-title-1" href="{{ challenge.get_absolute_url }}">{{challenge.title}}</a>
+              </div>
+            </div>
+
+            <div class="info-container-1">
+              <div class="logo-container-1">
+                <img class="logo-1" src="{% static 'logo/deadline.png' %}">
+                <div>{{ challenge.idea_submission_deadline |date:"F d, Y" }}</div>
+              </div>
+              <div class="logo-container-1">
+                <img class="logo-1" src="{% static 'logo/lightbulb.png' %}">
+                <div>{{ challenge.idea_count }}</div>
+              </div>
+            </div>
+          </div>
+
+          {%empty%}
+          <p>No Challenges Posted.</p>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="tab-pane fade" id="nav-challenge_drafts" role="tabpanel" aria-labelledby="nav-challenge_drafts-tab">
+        <header>
+          <p>
+          <h3 class="mb-3">Challenge Drafts</h3>
+          </p>
+        </header>
+        <div class="row">
+          {% for challenge in user_obj.get_challenges_draft %}
+          <div class="cha-item-1">
+            <div>
+              <a href="{{ challenge.get_absolute_url }}">
+                <img class="cha-item-img-1" src="{{ challenge.thumbnail.url }}" alt="MyPhoto">
+              </a>
+              <div>Last modified: {{ challenge.date_modified |date:"F d, Y" }}</div>
+              <div>
+                <a class="cha-item-title-1" href="{{ challenge.get_absolute_url }}">{{challenge.title}}</a>
+              </div>
+              <div>
+                <a href="{% url 'challenge-update' pk=challenge.pk %}"> Edit Draft</a>
+              </div>
+            </div>
+            {%empty%}
+            <p>No Drafts.</p>
+            {% endfor %}
+          </div>
+        </div>
+      <div class="tab-pane fade" id="nav-pending" role="tabpanel" aria-labelledby="nav-pending-tab">
+        <header>
+          <p>
+          <h3 class="mb-3">Pending Ideas</h3>
+          </p>
+        </header>
+        <div class="row">
+          {% for pending in unapproved %}
+            <div class="item-1">
+              <div>
+                <a href="{{ pending.get_absolute_url }}">
+                  <img class="idea-img-1" src="{{ pending.thumbnail.url }}" alt="MyPhoto">
+                </a>
+                <a class="item-title-1" href="{{ pending.get_absolute_url }}">{{ pending.title }}</a>
+                <div class="p-1">{{ pending.overview }}</div>
+              </div>
+            </div>
+          {%empty%}
+            <p>No Unapproved Ideas.</p>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock content %}

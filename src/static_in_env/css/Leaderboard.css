@@ -1,0 +1,94 @@
+.content-section {
+  border-top: 1px solid black;
+  background-color: #e9ecef;
+}
+
+.content-container {
+  width: 90vw;
+  max-width: 700px;
+  height: 1000px;
+  margin: 0 auto;
+  margin-top: 1rem;
+}
+
+.content-title {
+  font-size: 2rem;
+}
+
+.table {
+  width: 100%;
+  display: table;
+  margin-top: 1rem;
+}
+
+.table-header {
+  display: table-header-group;
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.table-header-cell {
+  display: table-cell;
+  padding: 1em;
+  text-align: justify;
+  border-bottom: 1px solid black;
+}
+
+.table-body {
+  display: table-row-group;
+}
+
+.table-row {
+  display: table-row;
+  background-color: #f8f9fa;
+}
+
+.table-body-cell {
+  display: table-cell;
+  text-align: justify;
+  padding: 1em;
+}
+
+.ranking {
+  font-size: 1.5rem;
+  color: #adb5bd;
+}
+
+.intro-section {
+  background-color: white;
+  border-top: 1px solid black;
+}
+
+.intro-container {
+  width: 50vw;
+  height: 50vh;
+  margin: 0 auto;
+  margin-top: 1rem;
+}
+
+.cover {
+  height: 60vh;
+  background-image: url("../img/leaderboard.jpg");
+  background-size: cover;
+  background-position-x: center;
+  background-position-y: center;
+  color: white;
+}
+
+.container {
+  width: 80vw;
+  height: inherit;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.text-container {
+  width: 50%;
+}
+
+.title {
+  color: white;
+  font-size: 2.5rem;
+}

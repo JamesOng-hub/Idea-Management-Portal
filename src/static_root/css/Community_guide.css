@@ -1,0 +1,28 @@
+.cover {
+  border-top: 1px solid black;
+  padding: 2rem 0;
+}
+
+.content {
+  width: 80vw;
+  margin: auto;
+}
+
+.card-title {
+  margin-bottom: 0.5rem;
+}
+
+.card-text {
+  overflow-y: scroll;
+  height: 10rem;
+  padding: 0.5rem 0;
+}
+
+.card-custom {
+  margin: 1rem;
+}
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0;
+}

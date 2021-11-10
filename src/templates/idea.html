@@ -1,0 +1,190 @@
+
+  {% extends 'base.html' %}
+  {% load static %}
+  {% block content %}
+    <link rel="stylesheet" href="{% static 'css/Idea_one.css' %}">
+
+    <section class="title-section">
+        <div class="title-container">
+          <div class="title-container-1">
+            <div>
+              <h1 class="title">{{ idea.title }}</h1>
+            </div>
+            
+            
+            <div class="btn-2">
+              {% if request.user.is_authenticated and idea.date_posted %}
+              <button class="btn btn-link text-dark border-0 btn-outline-light" style="font-size:26px" id="vote-button"
+                value="{{idea.id}}">
+                {% if voted %}
+                <span name="name" style="background-color: grey" class="btn">UNVOTE</span>
+                {% else %}
+                <span name="name" style="background-color: green; color: white;" class="btn">VOTE</span>
+                {% endif %}
+              </button>
+              <span class="" id="vote_count" style="font-size:26px;">{{idea.vote_count}}</span>
+              {% endif %}
+            </div>
+          </div>
+          {% if challenge %}<div><a class="h6" href="{% url 'challenge-detail' challenge.pk %}">Challenge : {{ challenge.title }}</a></div>
+          {% endif %}
+          <div style="display: inline;">
+          {% for tag in idea.tags.all %}
+            <span class="item-tag-1">{{ tag }}</span>
+          {% endfor %}
+          </div>
+  
+          <!-- </div> -->
+          <div class="details-container">
+            <div class="details-container-1">
+              <div class="profile-container-1">
+                <a href="{% url 'user-profile' idea.author.user.username %}">
+                <img class="profile-1" src="{{ idea.author.image.url}}" alt="not found"
+                  onerror=this.src="{% static 'logo/user.png' %}"></a>
+                  <a href="{% url 'user-profile' idea.author.user.username %}">{{ idea.author }}</a>
+              </div>
+              {% if idea.date_posted %}
+              <div class="logo-container-1">
+                <img class="logo-1" src="{% static 'logo/calendar.png' %}">
+                <div>{{ idea.date_posted|date:"F d, Y"}}</div>
+              </div>
+              {% endif %}
+              <div class="logo-container-1">
+                <img class="logo-1" src="{% static 'logo/comment.png' %}">
+                <div>{{ idea.comment_count }}</div>
+              </div>
+            
+              {% if idea.author.user == user %}
+              <a class="logo-container-1" data-toggle="modal" data-target="#deleteModal" style="cursor: pointer;"><img class="logo-1"
+                  src="{% static 'logo/delete.png' %}"></a>
+
+              <!-- Modal -->
+              <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="exampleModalLabel">Confirmation</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      Are you sure you want to delete your idea?
+                    </div>
+                    <div class="modal-footer">
+                      <a href="{% url 'idea-delete' pk=idea.pk %}" class="btn btn-danger">delete</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+                <a class="logo-container-1" href="{% url 'idea-update' pk=idea.pk %}"><img class="logo-1"
+                    src="{% static 'logo/edit.png' %}">
+                </a>
+              {% endif %}
+              {% if challenge and user == challenge.author %}
+              <div class="approve-review">
+                {% if not idea.approved %}
+                <form><input class="btn btn-outline-secondary mx-2" type="submit" name="approve" value="Approve"></form>
+                
+                {% else %}
+                <form><input class="btn btn-outline-danger mx-2" type="submit" name="unapprove" value="Unapprove"></form>
+                <button class="btn btn-outline-secondary mx-2"><a href="{% url 'idea-review' slug=idea.slug %}"> Review </a></button>
+                <div>Score: {{ score }}</div>
+                {% endif %}
+              </div>
+              {% endif %}
+
+            </div>
+            <div class="details-container-1">
+              
+
+            </div>
+          
+          
+          
+          </div>
+          <img src="{{ idea.thumbnail.url }}" class="thumbnail">
+        </div>
+
+    </section>
+    <section class="content-section">
+      <div class="content-container">
+        {{ idea.content | safe }}
+      </div>
+
+        <!-- pagination -->
+    </section>
+    {% if idea.date_posted %}
+    <section  class="comment-section">
+      <div class="comment-container">
+        <h2 class="comments">Comments</h2>
+        {% for comment in idea.get_comments %}
+          <div class="comment-item">
+            <div class="comment-container-1">
+              <img class="profile-1" src="{{ comment.user.profile.image.url }}" alt="not found" onerror=this.src="{% static 'logo/user.png' %}">
+              <div>
+                <span class="comment-username">{{comment.user.username}} </span>
+                <span>{{ comment.content }}</span>
+           
+                <div>
+                  <span class="comment-detail">{{ comment.date_posted }}</span>
+                </div>
+              </div>
+            </div> 
+          </div>
+        {% empty %}
+          No comments.
+        {% endfor %}
+        {% if request.user.is_authenticated %}
+          <div class="add-comment">
+                    <form method="POST" class="commenting-form">
+                      {% csrf_token %}
+                      <div class="">
+                        <!-- Change styling for form.  -->
+                        <!-- how to get rid of 'content' -->
+                          {{ form }}
+                          <div class="comment-btn-container">
+                            <button type="submit" class="btn btn-secondary">Submit Comment</button>
+                          </div>
+                      </div>
+                    </form>
+          </div>
+        {% endif %}
+      </div>
+      <script>
+        $(document).on('click', '#vote-button', function (e) {
+          e.preventDefault();
+          $.ajax({
+            type: 'POST',
+            url: "{% url 'vote' %}",
+            data: {
+              ideaid: $('#vote-button').val(),
+              csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+              action: 'post'
+            },
+            success: function (json) {
+              document.getElementById("vote_count").innerHTML = json['result']
+              
+              sub = document.getElementsByName("name");
+              if(json['voted']==true){
+                $(sub).text("UNVOTE");
+                $(sub).css("background-color", "grey");
+                $(sub).css("color", "white");
+
+              }
+              else if (json['voted']==false){
+                $(sub).text("VOTE");
+                $(sub).css("background-color", "green");
+              }
+            },
+            error: function (xhr, errmsg, err) {
+            }
+          });
+        })
+      </script>
+
+    </section>
+    {% endif %}
+
+    {% endblock content %}
+

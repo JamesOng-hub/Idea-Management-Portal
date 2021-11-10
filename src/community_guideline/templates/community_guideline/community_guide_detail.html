@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/Community_guide_detail.css' %}" type="text/css">
+
+
+    <div class="cover">
+   
+        <div class ="container"> 
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'guideline-list'%}">Community Guidelines</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{object.title}}</li>
+                </ol>
+            </nav>
+            <div class="content-container">
+                <h1 class="title">{{object.title}}</h1>
+                <p class="content">{{object.content | safe}}</p>
+            </div>  
+            
+        </div>
+    </div>
+{% endblock%}

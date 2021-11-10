@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+ {% load crispy_forms_tags %}
+ {% load i18n %}
+ {% load account %}
+
+ {% block head_title %}{% trans "Confirm E-mail Address" %}{% endblock %}
+ {% block content %}
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-social/5.1.1/bootstrap-social.css">
+
+ <!-- Container containing all contents -->
+ <div class="container">
+   <div class="row justify-content-center">
+     <div class="col-12 col-md-9 col-lg-7 col-xl-6">
+       <!-- White Container -->
+       <div class="container bg-white rounded mt-4 mb-4 px-4">
+         <div class="pt-3 pb-3">
+           <form method="POST" class="form-horizontal">
+             <fieldset class="form-group">
+                 <legend class="border-bottom mb-4">Confirm E-mail Address</legend>
+                 {% if confirmation %}
+
+                     {% user_display confirmation.email_address.user as user_display %}
+
+                     <p>
+                         {% blocktrans with confirmation.email_address.email as email %}
+                         Please confirm that <a href="mailto:{{ email }}">{{ email }}</a> 
+                         is an e-mail address for user {{ user_display }}.
+                         {% endblocktrans %}
+                     </p>
+
+                     <form method="post" action="{% url 'account_confirm_email' confirmation.key %}">
+                     {% csrf_token %}
+                         <button class="btn btn-secondary" type="submit">{% trans 'Confirm' %}</button>
+                     </form>
+
+                 {% else %}
+
+
+                     <p>
+                        The link was set to expire after a certain amount of time. <a href="/accounts/signup">Please try again.</a>
+                      </p>
+                      <p>
+                        If the problem still persists, please contact with our support team.
+                      </p>
+
+                 {% endif %}
+             </fieldset>
+             <div class="px-4 pt-2">
+               <hr></hr>
+           </div>
+           </form>
+         </div>
+       </div>
+     </div>
+   </div>
+ </div>
+ {% endblock content %}

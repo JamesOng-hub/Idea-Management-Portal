@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block content %} 
+  <link rel="stylesheet" href="{% static 'css/Idea_one.css' %}">
+
+  
+  <section class="title-section">
+    <div class="container">
+    <div class="page-header">
+      <h3 style="display:inline">Idea Review </h3>  
+      <button type="button" data-toggle="modal" data-target="#exampleModal" class="btn btn-outline-info float-right">Get
+        Page URL</button>    
+    </div>
+    </div>
+    <div class="title-container">
+      <div class="title-container-1">
+        <h1 class="title">{{ idea.title }}</h1>
+      </div>
+  
+      {% for tag in idea.tags.all %}
+        <span class="item-tag-1">{{ tag }}</span>
+      {% endfor %} 
+  
+      <div class="details-container">
+        <div class="details-container-1">
+          <div class="profile-container-1">
+            <img class="profile-1" src="{{ idea.author.image.url}}" alt="not found"
+              onerror=this.src="{% static 'logo/user.png' %}">
+            <div>{{ idea.author }}</div>
+          </div>
+        </div>
+      </div>
+      <img src="{{ idea.thumbnail.url }}" class="thumbnail">
+    </div>
+  </section>
+  <section class="content-section">
+    <div class="content-container">
+      {{ idea.content | safe }}
+    </div>
+  </section>
+  <div class="container">
+    <div class="col-12 col-md-9">
+      <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Review Form Link</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div class="input-group mb-3">
+                <input type="text" class="form-control" id="myInput" style="max-width: 100%;">
+                <div class="input-group-append">
+                  <button class="btn btn-outline-secondary cpy" type="button" onclick="getURL()">Copy</button>
+                </div>
+              </div>
+              <span class="message"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <form method="POST" class="form-horizontal">
+        {% csrf_token %}
+        <fieldset class="form-group">
+          <legend class="border-bottom mb-4" style="display:inline">Idea Evaluation for <h3 style="display:inline">
+              {{idea.title }}</h3>
+          </legend>
+          {% for form in form_list %}
+            {% crispy form form.helper %}
+          {% endfor %}
+        </fieldset>
+        <div class="form-group">
+          <button class="btn btn-outline-info" type="submit">Submit Review</button>
+        </div>
+      </form>
+    </div>
+    <br>
+  </div>
+
+  <script>
+    document.getElementById("myInput").value = window.location.href;
+    function getURL() {
+      var url = document.getElementById("myInput");
+      url.select();
+      url.setSelectionRange(0, 99999);
+      /* Copy the text inside the text field */
+      document.execCommand("copy");
+      $(".message").text("link copied");
+      }
+  </script>
+{% endblock %}

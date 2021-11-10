@@ -1,0 +1,52 @@
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'css/Header.css' %}">
+
+
+  <nav class="navbar navbar-expand-lg navbar-light ">
+    <div class="nav container-fluid">
+      <div>
+        <a href="/" class="nav-brand"><img class="company-logo" src="{% static 'logo/ucl.png' %}" alt="My Logo"></a>
+      </div>
+      
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        
+        <ul class="link-list">
+          <li class="link"><a href="/">Home</a></li>
+          <li class="link"><a href="/ideas">Ideas</a></li>
+          <li class="link"><a href="/challenges">Challenges</a></li>
+          <li class="link"><a href="/leaderboard">LeaderBoard</a></li>
+          {% if user.is_authenticated %}
+          <li class="link"><a href="{% url 'user-profile' user.username  %}">Profile</a>
+          </li>
+          <li class="link"><a href="/accounts/logout">Log Out </a></li>
+          {% else %}
+          <li class="link"><a href="/accounts/login">Log In </a></li>
+          <li class="link"><a href="/accounts/signup">Sign Up </a></li>
+          {% endif %}
+          <!-- <li class="link"><a href="/contact">Contact</a></li> -->
+  
+        </ul>
+  
+      </div>
+    </div>
+  </nav>
+
+
+      {% if messages %}
+        {% for message in messages %}
+        <div class="row justify-content-center">
+          <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+          {{ message }}
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        </div>
+        {% endfor %}
+      {% endif %}
+

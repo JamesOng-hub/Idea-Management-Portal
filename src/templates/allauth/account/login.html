@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% load socialaccount %}
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'css/Login_one.css' %}">
+<section class="background">
+  <div class="login-container">
+      <form method="POST" class="form-container">
+        {% csrf_token %}
+        <!-- <fieldset > -->
+          <div>
+            <div class="login-title">Log In</div>
+            {{ form|crispy }}
+          </div>
+          
+        <!-- </fieldset> -->
+        <div class="border-bottom">
+          <button class="btn btn-success" type="submit">Login</button>
+          <small >
+            <a href="/accounts/password/reset" class="links" >Forgot password?</a>
+          </small>
+        </div>
+      </form>  
+    <div class="logo-container-1">
+      <img src="{% static 'logo/key.svg'%}" class="logo-1">
+      <a href="https://uclapi.com/oauth/authorise/?client_id=0761046984609257.7533240572162003&state=1" class="links">Sign In with SSO</a>
+    </div>
+    <div class="logo-container-1">
+      <img src="{% static 'logo/google.png'%}" class="logo-1">
+      <a href="{% provider_login_url 'google' action='reauthenticate' process='login'%}" class="links">Login with Google</a>
+    </div>
+    <div class="logo-container-1">
+      <img src="{% static 'logo/facebook.png'%}" class="logo-1">
+      <a href="{% provider_login_url 'facebook' method='oauth2' %}" class="links">Login with Facebook</a>
+    </div>
+
+
+    <small class="text-muted">
+      Need An Account? <a class="links" href="/accounts/signup" name="signup">Sign Up Now</a>
+    </small>
+
+  </div>
+
+</section>
+{% endblock content %}
+
